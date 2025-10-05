@@ -1,0 +1,22 @@
+</main>
+    <footer class="main-footer">
+        <p>&copy; <%= new Date().getFullYear() %> EJS Todo List Project. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // CLIENT-SIDE ALERT SCRIPT
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('addTaskForm');
+            const taskInput = document.getElementById('taskInput');
+            
+            form.addEventListener('submit', (e) => {
+                if (taskInput.value.trim() === '') {
+                    // Prevent submission if input is empty
+                    e.preventDefault(); 
+                    alert('Task description cannot be empty!');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<%- include('header') %>
+
+    <% if (alertMessage) { %>
+        <div class="alert"><%= alertMessage %></div>
+    <% } %>
+
+    <section class="task-creation-box">
+        <h2>Add New Task</h2>
+        <form id="addTaskForm" action="/add" method="POST">
+            <div class="input-group">
+                <input type="text" id="taskInput" name="taskText" placeholder="What needs to be done?" required>
+                <select name="priority">
+                    <option value="High">High Priority</option>
+                    <option value="Medium">Medium Priority</option>
+                    <option value="Low" selected>Low Priority</option>
+                </select>
+                <button type="submit" class="btn-add">Add Task</button>
+            </div>
+        </form>
+    </section>
+
+    <hr>
+
+    <section class="task-filters">
+        <h2>Tasks</h2>
+        <form action="/" method="GET" class="filter-form">
+            <label for="priorityFilter">Filter by Priority:</label>
+            <select name="priority" id="priorityFilter" onchange="this.form.submit()">
+                <option value="All" <%= currentFilter === 'All' ? 'selected' : '' %>>All</option>
+                <option value="High" <%= currentFilter === 'High' ? 'selected' : '' %>>High</option>
+                <option value="Medium" <%= currentFilter === 'Medium' ? 'selected' : '' %>>Medium</option>
+                <option value="Low" <%= currentFilter === 'Low' ? 'selected' : '' %>>Low</option>
+            </select>
+        </form>
+    </section>
+
+    <section class="task-list">
+        <% if (tasks.length > 0) { %>
+            <ul class="todo-list">
+                <% tasks.forEach(task => { %>
+                    <li class="todo-item priority-<%= task.priority.toLowerCase() %> <%= task.completed ? 'completed' : '' %>" data-id="<%= task.id %>">
+                        
+                        <form action="/toggle/<%= task.id %>" method="POST" class="toggle-form">
+                            <input type="checkbox" onchange="this.form.submit()" <%= task.completed ? 'checked' : '' %>>
+                        </form>
+
+                        <div class="task-content">
+                            <p class="task-text"><%= task.text %></p>
+                            
+                            <form action="/edit/<%= task.id %>" method="POST" class="edit-form hidden">
+                                <input type="text" name="newText" value="<%= task.text %>" required>
+                                <button type="submit" class="btn-save">Save</button>
+                            </form>
+                        </div>
+                        
+                        <div class="task-actions">
+                            <button class="btn-edit" onclick="toggleEdit(this)">Edit</button>
+                            
+                            <form action="/delete/<%= task.id %>" method="POST" class="delete-form">
+                                <button type="submit" class="btn-delete">Delete</button>
+                            </form>
+                        </div>
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p class="no-tasks">No tasks found for the selected filter.</p>
+        <% } %>
+    </section>
+
+    <script>
+        // Client-side script to toggle edit mode
+        function toggleEdit(button) {
+            const taskItem = button.closest('.todo-item');
+            const taskTextElement = taskItem.querySelector('.task-text');
+            const editForm = taskItem.querySelector('.edit-form');
+            const newText = editForm.querySelector('input[name="newText"]');
+            
+            // Toggle visibility
+            taskTextElement.classList.toggle('hidden');
+            editForm.classList.toggle('hidden');
+
+            // If switching to edit mode, focus the input
+            if (!editForm.classList.contains('hidden')) {
+                newText.focus();
+                // Ensure the input value is up-to-date
+                newText.value = taskTextElement.textContent.trim();
+            }
+        }
+    </script>
+
+<%- include('footer') %>
